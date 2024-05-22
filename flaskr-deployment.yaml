@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: flask
-          image: voxten/python-docker-server:latest
+          image: voxten/python-docker-web:latest
           ports:
             - containerPort: 5000
           env:
