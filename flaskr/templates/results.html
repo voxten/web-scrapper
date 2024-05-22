@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrape Results</title>
+</head>
+<body>
+    <h1>Scraped Data from {{ url }}</h1>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/all_data">View All Data</a>
+    </nav>
+    <h4>Phone Numbers</h4>
+    <ol>
+        {% for number in results.phone_numbers %}
+        <li>{{ number }}</li>
+        {% endfor %}
+    </ol>
+    <h4>Emails</h4>
+    <ol>
+        {% for email in results.emails %}
+        <li>{{ email }}</li>
+        {% endfor %}
+    </ol>
+    <h4>Street Names</h4>
+    <ol>
+        {% for street in results.street_names %}
+        <li>{{ street }}</li>
+        {% endfor %}
+    </ol>
+    <h4>Cities</h4>
+    <ol>
+        {% for city in results.cities %}
+        <li>{{ city }}</li>
+        {% endfor %}
+    </ol>
+    <h4 style="padding-bottom: 30px">Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally </h4>
+</body>
+</html>

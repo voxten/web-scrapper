@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Scraper</title>
+</head>
+<body>
+    <h1>Scrape Data from URL</h1>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/all_data">View All Data</a>
+    </nav>
+
+    <form action="/scrape" method="post">
+        <input type="text" name="url" placeholder="Enter URL here">
+        <input type="submit" value="Scrape">
+    </form>
+
+    <h4>Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally </h4>
+</body>
+</html>

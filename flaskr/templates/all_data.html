@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Scraped Data</title>
+</head>
+<body>
+    <h1>All Scraped Data</h1>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/all_data">View All Data</a>
+    </nav>
+    <div id="all">
+        <form action="/delete_all" method="post">
+            <input type="submit" value="Delete All Data">
+        </form>
+    </div>
+
+    {% for collection_name, documents in all_data.items() %}
+    <h2>{{ collection_name }}</h2>
+    {% for doc in documents %}
+        <h4>{{ doc.type }}</h4>
+        <ol>
+        {% for item in doc.data %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ol>
+    {% endfor %}
+    {% endfor %}
+    <h4 style="padding-bottom: 30px">Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally </h4>
+</body>
+</html>

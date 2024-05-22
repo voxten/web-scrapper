@@ -1,0 +1,148 @@
+html {
+    font-family: 'Trebuchet MS', sans-serif;
+    background: white;
+    padding: 1rem;
+}
+
+body {
+    max-width: 960px;
+    margin: 0 auto;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 10px;
+    background: white;
+    color: #ddd;
+    min-height: 250px;
+}
+
+h1 {
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #092ad0;
+    margin: 1rem 0;
+    text-align: center;
+    padding-top: 20px;
+}
+
+h2 {
+    text-align: center;
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #092ad0;
+}
+
+h4 {
+    text-align: center;
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #092ad0;
+}
+
+a {
+    color: #ffa8e1;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    margin: 0 auto 0 auto;
+    width: 245px;
+}
+
+nav h1 {
+    flex: auto;
+    margin: 0;
+}
+
+nav h1 a {
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav a {
+    text-decoration: none;
+    min-width: 105px;
+    padding: 5px;
+    margin-right: 10px;
+    text-align: center;
+    background: #3c57e0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+ul li {
+    text-decoration: none;
+    list-style: none;
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #092ad0;
+}
+
+li {
+    min-width: 150px;
+}
+
+ol {
+    margin: 0 auto 0 auto;
+    width: 150px;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    color: #3c57e0;
+}
+
+#all form {
+    width: 120px;
+    padding: 0;
+    margin: 0 auto 0 auto;
+    padding-top: 15px;
+}
+
+nav ul li a,
+nav ul li span,
+header .action {
+    display: block;
+    padding: 0.5rem;
+    text-decoration: none;
+}
+
+form {
+    padding: 0;
+    width: 255px;
+    margin: 0 auto 0 auto;
+    padding-top: 15px;
+}
+
+input.danger {
+    color: #cc2f2e;
+}
+
+input[type=submit] {
+    align-self: start;
+    background: #3c57e0;
+    border: none;
+    color: #fff;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+input[type=submit]:hover {
+    background: #092ad0;
+}
+
+nav a:hover {
+    background: #092ad0;
+}
+
+body:before {
+    content: '🌟';
+    font-size: 3em;
+    color: #ffa8e1;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
