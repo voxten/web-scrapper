@@ -30,12 +30,15 @@
         <li>{{ street }}</li>
         {% endfor %}
     </ol>
-    <h4>Cities</h4>
-    <ol>
-        {% for city in results.cities %}
-        <li>{{ city }}</li>
-        {% endfor %}
-    </ol>
+    <h4>Social Media</h4>
+    {% for platform, links in results.social_media.items() %}
+        <h4>{{ platform|capitalize }}</h4>
+        <ol>
+            {% for link in links %}
+            <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+            {% endfor %}
+        </ol>
+    {% endfor %}
     <h4 style="padding-bottom: 30px">Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally </h4>
 </body>
 </html>

@@ -23,9 +23,18 @@
     {% for doc in documents %}
         <h4>{{ doc.type }}</h4>
         <ol>
-        {% for item in doc.data %}
-            <li>{{ item }}</li>
-        {% endfor %}
+        {% if doc.type == 'social_media' %}
+            {% for platform, links in doc.data.items() %}
+                <h4>{{ platform|capitalize }}</h4>
+                {% for link in links %}
+                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            {% for item in doc.data %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        {% endif %}
         </ol>
     {% endfor %}
     {% endfor %}
