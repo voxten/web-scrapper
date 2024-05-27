@@ -34,7 +34,7 @@ h4 {
 }
 
 a {
-    color: #ffa8e1;
+    color: #3c57e0;
 }
 
 nav {
@@ -81,13 +81,13 @@ ul li {
     color: #092ad0;
 }
 
-li {
-    min-width: 150px;
+li a {
+    text-decoration: none;
+    text-align: center;
 }
 
 ol {
     margin: 0 auto 0 auto;
-    width: 150px;
     padding: 0;
     list-style: none;
     text-align: center;
