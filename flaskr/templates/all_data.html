@@ -12,12 +12,83 @@
         <a href="/">Home</a>
         <a href="/all_data">View All Data</a>
     </nav>
-    <div id="all">
-        <form action="/delete_all" method="post">
-            <input type="submit" value="Delete All Data">
+
+    <div id="viewDataDiv">
+        <form action="/view_data" method="post" id="viewDataForm">
+            <label for="collection">Choose a collection:</label>
+            <select name="collection" id="collection">
+                {% for collection_name in collections %}
+                    <option value="{{ collection_name }}" {% if selected_collection == collection_name %}selected{% endif %}>{{ collection_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="data_type">Choose data type:</label>
+            <select name="data_type" id="data_type">
+                <option value="none" {% if selected_data_type == "none" %}selected{% endif %}>None</option>
+                <option value="phone_numbers" {% if selected_data_type == "phone_numbers" %}selected{% endif %}>Phone Numbers</option>
+                <option value="emails" {% if selected_data_type == "emails" %}selected{% endif %}>Emails</option>
+                <option value="street_names" {% if selected_data_type == "street_names" %}selected{% endif %}>Street Names</option>
+                <option value="social_media" {% if selected_data_type == "social_media" %}selected{% endif %}>Social Media</option>
+            </select>
+
+            <input type="submit" value="View Data">
+        </form>
+
+        <form action="/all_data" method="get" id="resetForm">
+            <input type="submit" value="Reset">
         </form>
     </div>
 
+    <form action="/delete_all" method="post" id="deleteAllForm">
+        <input type="submit" value="Delete All Data">
+    </form>
+
+    {% if selected_data is not none %}
+    <h2>Collection: {{ selected_collection }}</h2>
+    <h4>Data Type: {{ selected_data_type }}</h4>
+
+    <ol>
+    {% if selected_data_type == 'social_media' %}
+        {% for doc in selected_data %}
+            {% for platform, links in doc.data.items() %}
+                <h4>{{ platform|capitalize }}</h4>
+                {% for link in links %}
+                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% if selected_data %}
+            {% for doc in selected_data %}
+                {% for item in doc.data %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <li>No data available for this type.</li>
+        {% endif %}
+    {% endif %}
+    </ol>
+    {% elif selected_collection and selected_data_type == 'none' %}
+    <h2>{{ selected_collection }}</h2>
+    {% for doc in all_data[selected_collection] %}
+        <h4>{{ doc.type }}</h4>
+        <ol>
+        {% if doc.type == 'social_media' %}
+            {% for platform, links in doc.data.items() %}
+                <h4>{{ platform|capitalize }}</h4>
+                {% for link in links %}
+                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            {% for item in doc.data %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        {% endif %}
+        </ol>
+    {% endfor %}
+    {% else %}
     {% for collection_name, documents in all_data.items() %}
     <h2>{{ collection_name }}</h2>
     {% for doc in documents %}
@@ -38,6 +109,8 @@
         </ol>
     {% endfor %}
     {% endfor %}
-    <h4 style="padding-bottom: 30px">Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally </h4>
+    {% endif %}
+
+    <h4 style="padding-bottom: 30px">Disclaimer: this site is only for educational purposes, the collected data is not sold to third parties or used illegally.</h4>
 </body>
 </html>

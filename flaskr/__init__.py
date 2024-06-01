@@ -9,10 +9,8 @@ from urllib.parse import urljoin
 from pymongo.server_api import ServerApi
 from concurrent.futures import ProcessPoolExecutor
 
-# Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
-# Pobranie informacji dotyczących połączenia z bazą z zmiennych środowiskowych
 mongo_host = os.getenv('MONGO_HOST', 'localhost')
 mongo_port = os.getenv('MONGO_PORT', '27017')
 mongo_user = os.getenv('MONGO_INITDB_ROOT_USERNAME', 'root')
@@ -20,11 +18,9 @@ mongo_pass = os.getenv('MONGO_INITDB_ROOT_PASSWORD', 'pass')
 mongo_url = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_host}:{mongo_port}/"
 
 client = MongoClient(mongo_url, server_api=ServerApi('1'))
-
 mydb = client["Projekt"]
 scraped_urls_collection = mydb["scraped_urls"]
 
-# Testowanie połączenia
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -32,7 +28,6 @@ except Exception as e:
     print(e)
 
 
-# Konwertuje ObjectID do Stringa
 def serialize_document(doc):
     if '_id' in doc:
         doc['_id'] = str(doc['_id'])
@@ -47,10 +42,7 @@ def home():
 @app.route('/scrape', methods=['POST'])
 async def scrape():
     url = request.form['url']
-
-    # Sprawdź czy obecny url został już wcześniej zescrappowany
     already_scraped = scraped_urls_collection.find_one({"url": url})
-
     html = await fetch_content(url)
 
     phone_number_patterns = [
@@ -62,7 +54,6 @@ async def scrape():
         r'\b\+\d{2} \d{3}-\d{3}-\d{3}\b'  # +xx xxx-xxx-xxx
     ]
 
-    # Użycie ProcessPoolExecutor dla CPU-bound tasks
     loop = asyncio.get_event_loop()
     with ProcessPoolExecutor() as executor:
         tasks = [
@@ -82,23 +73,16 @@ async def scrape():
     }
 
     if not already_scraped:
-        # Tworzenie kolekcji dla strony
         site_collection = mydb[url.replace("https://", "").replace("/", "_")]
-
-        # Przechowywanie zescrappowanego kontentu
         if phone_numbers:
             site_collection.insert_one({"type": "phone_numbers", "data": phone_numbers})
-
         if emails:
             site_collection.insert_one({"type": "emails", "data": emails})
-
         if street_names:
             site_collection.insert_one({"type": "street_names", "data": street_names})
-
         if social_media:
             site_collection.insert_one({"type": "social_media", "data": social_media})
 
-        # Oznacz podany URL jako już zescrappowany
         scraped_urls_collection.insert_one({"url": url})
 
     return render_template('results.html', url=url, results=results)
@@ -106,15 +90,35 @@ async def scrape():
 
 @app.route('/all_data')
 def all_data():
-    collections = mydb.list_collection_names()
+    collections = [coll for coll in mydb.list_collection_names() if coll != "scraped_urls"]
     all_data = {}
     for collection_name in collections:
-        if collection_name != "scraped_urls":
-            collection = mydb[collection_name]
-            documents = collection.find()
-            all_data[collection_name] = [serialize_document(doc) for doc in documents]
+        collection = mydb[collection_name]
+        documents = collection.find()
+        all_data[collection_name] = [serialize_document(doc) for doc in documents]
 
-    return render_template('all_data.html', all_data=all_data)
+    return render_template('all_data.html', all_data=all_data, collections=collections, selected_data=None,
+                           selected_collection=None, selected_data_type=None)
+
+
+@app.route('/view_data', methods=['POST'])
+def view_data():
+    collection_name = request.form['collection']
+    data_type = request.form['data_type']
+
+    collection = mydb[collection_name]
+    if data_type == 'none':
+        selected_data = None
+    else:
+        documents = collection.find({"type": data_type})
+        selected_data = [serialize_document(doc) for doc in documents]
+
+    all_data = {collection_name: [serialize_document(doc) for doc in collection.find()]}
+    collections = [coll for coll in mydb.list_collection_names() if coll != "scraped_urls"]
+
+    return render_template('all_data.html', all_data=all_data, collections=collections,
+                           selected_data=selected_data, selected_collection=collection_name,
+                           selected_data_type=data_type)
 
 
 @app.route('/delete_all', methods=['POST'])
