@@ -1,0 +1,39 @@
+{
+    "ans-elblag.pl_": [
+        {
+            "_id": "665c92baefeac3b07d4d060c",
+            "type": "phone_numbers",
+            "data": [
+                "55 629 05 05",
+                "55 629 05 54"
+            ]
+        },
+        {
+            "_id": "665c92baefeac3b07d4d060d",
+            "type": "street_names",
+            "data": [
+                "ul. Wojska Polskiego 1, 82-300 Elbl\u0105g"
+            ]
+        },
+        {
+            "_id": "665c92baefeac3b07d4d060e",
+            "type": "social_media",
+            "data": {
+                "twitter": [
+                    "https://twitter.com/anselblag"
+                ],
+                "facebook": [
+                    "https://www.facebook.com/anselblag"
+                ],
+                "instagram": [
+                    "https://www.instagram.com/anselblag/",
+                    "https://instagram.com/anselblag/"
+                ],
+                "youtube": [
+                    "https://www.youtube.com/user/pwszelblag",
+                    "https://www.youtube.com/c/AkademiaNaukStosowanychwElbl%C4%85gu"
+                ]
+            }
+        }
+    ]
+}
