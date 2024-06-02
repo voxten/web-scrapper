@@ -1,13 +1,17 @@
 from flask import Flask, request, render_template, redirect, url_for
 import os
+import logging
 from pymongo import MongoClient
 import asyncio
+from datetime import datetime
 import re
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pymongo.server_api import ServerApi
 from concurrent.futures import ProcessPoolExecutor
+import json
+from github import Github, GithubException
 
 app = Flask(__name__)
 
@@ -17,9 +21,21 @@ mongo_user = os.getenv('MONGO_INITDB_ROOT_USERNAME', 'root')
 mongo_pass = os.getenv('MONGO_INITDB_ROOT_PASSWORD', 'pass')
 mongo_url = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_host}:{mongo_port}/"
 
+
+# Load the GitHub token and repository details from environment variables
+github_token = os.getenv('GITHUB_TOKEN')
+github_repo_name = os.getenv('GITHUB_REPO_NAME')
+github_branch_name = os.getenv('GITHUB_BRANCH_NAME')
+
+
+logging.info(f'GITHUB_REPO_NAME: {github_repo_name}')
+logging.info(f'GITHUB_BRANCH_NAME: {github_branch_name}')
+
+
 client = MongoClient(mongo_url, server_api=ServerApi('1'))
 mydb = client["Projekt"]
 scraped_urls_collection = mydb["scraped_urls"]
+
 
 try:
     client.admin.command('ping')
@@ -38,6 +54,48 @@ def serialize_document(doc):
 def home():
     return render_template('index.html')
 
+
+@app.route('/export_to_github', methods=['POST'])
+def export_to_github():
+    logging.info('Attempting to connect to GitHub')
+    g = Github(github_token)
+    try:
+        repo = g.get_repo(github_repo_name)
+        logging.info(f'Connected to repo: {github_repo_name}')
+    except GithubException as e:
+        logging.error(f'Failed to connect to GitHub: {e}')
+        return str(e), 500
+
+    now = datetime.now()
+    branch = github_branch_name
+
+    # Collect all data from the MongoDB
+    collections = [coll for coll in mydb.list_collection_names() if coll != "scraped_urls"]
+    all_data = {}
+    for collection_name in collections:
+        collection = mydb[collection_name]
+        documents = collection.find()
+        all_data[collection_name] = [serialize_document(doc) for doc in documents]
+
+    # Convert the data to JSON format
+    all_data_json = json.dumps(all_data, indent=4)
+
+    # Create a commit message
+    commit_message = "Export scraped data"
+
+    # Specify the file path in the repository
+    file_path = f"data/scraped_data_{now.strftime('%H-%M-%d-%m-%Y')}.json"
+
+    # Get the file if it exists in the repository
+    try:
+        contents = repo.get_contents(file_path, ref=branch)
+        # Update the file
+        repo.update_file(contents.path, commit_message, all_data_json, contents.sha, branch=branch)
+    except:
+        # If the file does not exist, create it
+        repo.create_file(file_path, commit_message, all_data_json, branch=branch)
+
+    return redirect(url_for('all_data'))
 
 @app.route('/scrape', methods=['POST'])
 async def scrape():
@@ -127,6 +185,14 @@ def delete_all():
     for collection_name in collections:
         mydb[collection_name].drop()  # Drop collection
     return redirect(url_for('all_data'))
+
+
+
+
+
+
+
+
 
 
 async def fetch_content(url):

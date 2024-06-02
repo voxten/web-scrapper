@@ -7,6 +7,7 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
+
 version: '3.8'
 services:
   web:
@@ -15,6 +16,9 @@ services:
       - "5000:5000"
     environment:
       - MONGO_HOST=mongodb
+      - GITHUB_TOKEN=your_github_token
+      - GITHUB_REPO_NAME=your_repo_name
+      - GITHUB_BRANCH_NAME=your_branch_name
     depends_on:
       - mongodb
   mongodb:
