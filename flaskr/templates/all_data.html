@@ -43,6 +43,10 @@
         <input type="submit" value="Delete All Data">
     </form>
 
+    <form action="/export_to_github" method="post" id="exportAllForm">
+        <input type="submit" value="Export All Data">
+    </form>
+
     {% if selected_data is not none %}
     <h2>Collection: {{ selected_collection }}</h2>
     <h4>Data Type: {{ selected_data_type }}</h4>

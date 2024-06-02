@@ -28,6 +28,21 @@ spec:
               value: "pass"
             - name: FLASK_ENV
               value: "production"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-secret
+                  key: token
+            - name: GITHUB_REPO_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: github-secret
+                  key: repo_name
+            - name: GITHUB_BRANCH_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: github-secret
+                  key: branch_name
 ---
 apiVersion: v1
 kind: Service

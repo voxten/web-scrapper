@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for
 import os
-import logging
 from pymongo import MongoClient
 import asyncio
 from datetime import datetime
@@ -11,7 +10,7 @@ from urllib.parse import urljoin
 from pymongo.server_api import ServerApi
 from concurrent.futures import ProcessPoolExecutor
 import json
-from github import Github, GithubException
+from github import Github
 
 app = Flask(__name__)
 
@@ -21,21 +20,14 @@ mongo_user = os.getenv('MONGO_INITDB_ROOT_USERNAME', 'root')
 mongo_pass = os.getenv('MONGO_INITDB_ROOT_PASSWORD', 'pass')
 mongo_url = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_host}:{mongo_port}/"
 
-
 # Load the GitHub token and repository details from environment variables
 github_token = os.getenv('GITHUB_TOKEN')
 github_repo_name = os.getenv('GITHUB_REPO_NAME')
 github_branch_name = os.getenv('GITHUB_BRANCH_NAME')
 
-
-logging.info(f'GITHUB_REPO_NAME: {github_repo_name}')
-logging.info(f'GITHUB_BRANCH_NAME: {github_branch_name}')
-
-
 client = MongoClient(mongo_url, server_api=ServerApi('1'))
 mydb = client["Projekt"]
 scraped_urls_collection = mydb["scraped_urls"]
-
 
 try:
     client.admin.command('ping')
@@ -57,15 +49,12 @@ def home():
 
 @app.route('/export_to_github', methods=['POST'])
 def export_to_github():
-    logging.info('Attempting to connect to GitHub')
+    # Print environment variables for debugging
+    print(f"GitHub Token: {github_token}")
+    print(f"GitHub Repo Name: {github_repo_name}")
+    print(f"GitHub Branch Name: {github_branch_name}")
     g = Github(github_token)
-    try:
-        repo = g.get_repo(github_repo_name)
-        logging.info(f'Connected to repo: {github_repo_name}')
-    except GithubException as e:
-        logging.error(f'Failed to connect to GitHub: {e}')
-        return str(e), 500
-
+    repo = g.get_repo(github_repo_name)
     now = datetime.now()
     branch = github_branch_name
 
@@ -87,15 +76,11 @@ def export_to_github():
     file_path = f"data/scraped_data_{now.strftime('%H-%M-%d-%m-%Y')}.json"
 
     # Get the file if it exists in the repository
-    try:
-        contents = repo.get_contents(file_path, ref=branch)
-        # Update the file
-        repo.update_file(contents.path, commit_message, all_data_json, contents.sha, branch=branch)
-    except:
-        # If the file does not exist, create it
-        repo.create_file(file_path, commit_message, all_data_json, branch=branch)
+
+    repo.create_file(file_path, commit_message, all_data_json, branch=branch)
 
     return redirect(url_for('all_data'))
+
 
 @app.route('/scrape', methods=['POST'])
 async def scrape():
@@ -185,14 +170,6 @@ def delete_all():
     for collection_name in collections:
         mydb[collection_name].drop()  # Drop collection
     return redirect(url_for('all_data'))
-
-
-
-
-
-
-
-
 
 
 async def fetch_content(url):

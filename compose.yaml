@@ -16,9 +16,6 @@ services:
       - "5000:5000"
     environment:
       - MONGO_HOST=mongodb
-      - GITHUB_TOKEN=your_github_token
-      - GITHUB_REPO_NAME=your_repo_name
-      - GITHUB_BRANCH_NAME=your_branch_name
     depends_on:
       - mongodb
   mongodb:
