@@ -13,7 +13,7 @@
         <a href="/all_data">View All Data</a>
     </nav>
 
-    <div id="viewDataDiv">
+    <div class="viewDataDiv">
         <form action="/view_data" method="post" id="viewDataForm">
             <label for="collection">Choose a collection:</label>
             <select name="collection" id="collection">
@@ -21,7 +21,6 @@
                     <option value="{{ collection_name }}" {% if selected_collection == collection_name %}selected{% endif %}>{{ collection_name }}</option>
                 {% endfor %}
             </select>
-
             <label for="data_type">Choose data type:</label>
             <select name="data_type" id="data_type">
                 <option value="none" {% if selected_data_type == "none" %}selected{% endif %}>None</option>
@@ -33,19 +32,18 @@
 
             <input type="submit" value="View Data">
         </form>
-
         <form action="/all_data" method="get" id="resetForm">
             <input type="submit" value="Reset">
         </form>
     </div>
-
-    <form action="/delete_all" method="post" id="deleteAllForm">
-        <input type="submit" value="Delete All Data">
-    </form>
-
-    <form action="/export_to_github" method="post" id="exportAllForm">
-        <input type="submit" value="Export All Data">
-    </form>
+    <div class="viewDataDiv">
+        <form action="/delete_all" method="post" id="deleteAllForm">
+            <input type="submit" value="Delete All Data">
+        </form>
+        <form action="/export_to_github" method="post" id="exportAllForm">
+            <input type="submit" value="Export All Data">
+        </form>
+    </div>
 
     {% if selected_data is not none %}
     <h2>Collection: {{ selected_collection }}</h2>

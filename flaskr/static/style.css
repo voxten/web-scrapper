@@ -101,28 +101,16 @@ ol {
     padding-top: 15px;
 }
 
-#viewDataDiv {
-    width: 80%;
-    margin: 0 auto 0 auto;
+.viewDataDiv {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 10px;
 }
 
-#viewDataDiv label {
+.viewDataDiv label {
     color: #092ad0;
     font-family: 'Trebuchet MS', sans-serif;
-}
-
-#viewDataForm {
-    width: 87%;
-    display: inline-block;
-}
-
-#resetForm {
-    width: 10%;
-    display: inline-block;
-}
-
-#deleteAllForm {
-    width: 120px;
 }
 
 nav ul li a,
@@ -134,9 +122,6 @@ header .action {
 }
 
 form {
-    padding: 0;
-    width: 255px;
-    margin: 0 auto 0 auto;
     padding-top: 15px;
 }
 

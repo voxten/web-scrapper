@@ -73,7 +73,7 @@ def export_to_github():
     commit_message = "Export scraped data"
 
     # Specify the file path in the repository
-    file_path = f"data/scraped_data_{now.strftime('%H-%M-%d-%m-%Y')}.json"
+    file_path = f"data/{now.strftime('%Y-%m-%d-%H-%M-%S')}_scraped_data.json"
 
     # Get the file if it exists in the repository
 
