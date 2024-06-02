@@ -1,0 +1,68 @@
+{
+    "ans-elblag.pl_": [
+        {
+            "_id": "665cd1dc0a2e51643ff61761",
+            "type": "phone_numbers",
+            "data": [
+                "55 629 05 05",
+                "55 629 05 54"
+            ]
+        },
+        {
+            "_id": "665cd1dc0a2e51643ff61762",
+            "type": "street_names",
+            "data": [
+                "ul. Wojska Polskiego 1, 82-300 Elbl\u0105g"
+            ]
+        },
+        {
+            "_id": "665cd1dc0a2e51643ff61763",
+            "type": "social_media",
+            "data": {
+                "twitter": [
+                    "https://twitter.com/anselblag"
+                ],
+                "facebook": [
+                    "https://www.facebook.com/anselblag"
+                ],
+                "instagram": [
+                    "https://www.instagram.com/anselblag/",
+                    "https://instagram.com/anselblag/"
+                ],
+                "youtube": [
+                    "https://www.youtube.com/c/AkademiaNaukStosowanychwElbl%C4%85gu",
+                    "https://www.youtube.com/user/pwszelblag"
+                ]
+            }
+        }
+    ],
+    "informatyk24.elblag.pl_": [
+        {
+            "_id": "665cd1e10a2e51643ff61765",
+            "type": "phone_numbers",
+            "data": [
+                "886-824-935"
+            ]
+        },
+        {
+            "_id": "665cd1e10a2e51643ff61766",
+            "type": "emails",
+            "data": [
+                "info@informatyk24.elblag.pl"
+            ]
+        },
+        {
+            "_id": "665cd1e10a2e51643ff61767",
+            "type": "social_media",
+            "data": {
+                "facebook": [
+                    "https://facebook.com/serwiskomputerowyelblag/",
+                    "https://www.facebook.com/serwiskomputerowyelblag"
+                ],
+                "instagram": [
+                    "https://www.instagram.com/informatykelblag"
+                ]
+            }
+        }
+    ]
+}
