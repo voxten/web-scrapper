@@ -9,10 +9,15 @@
 ### Pushing Image
  	docker tag python-docker-web:latest <your-repository-name>/python-docker-web:latest
 	docker push <your-repository-name>/python-docker-web:latest
+
+ 	docker tag python-docker-scrapper:latest <your-repository-name>/python-docker-scrapper:latest
+	docker push <your-repository-name>/python-docker-scrapper:latest
+
 	docker images
 ### Applying deployments for Kubernetes
 	kubectl apply -f mongodb-deployment.yaml
 	kubectl apply -f flask-deployment.yaml
+    kubectl apply -f scrapper-deployment.yaml
 ### Building an app
  	docker context use default
 	docker compose up --build

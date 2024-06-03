@@ -3,14 +3,12 @@ import os
 from pymongo import MongoClient
 import asyncio
 from datetime import datetime
-import re
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 from pymongo.server_api import ServerApi
 from concurrent.futures import ProcessPoolExecutor
 import json
 from github import Github
+from requests.exceptions import MissingSchema
+from web_scrapper import scrape
 
 app = Flask(__name__)
 
@@ -47,6 +45,26 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/scrape', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        print("Scraping started")
+        url = request.form['url']
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            data = loop.run_until_complete(scrape(url))
+            print("Scraping finished")
+            if data:
+                return render_template('results.html', url=url, results=data)
+            else:
+                return render_template('failed_results.html')
+        except MissingSchema:
+            return render_template('invalid_url.html')
+
+    return render_template('index.html')
+
+
 @app.route('/export_to_github', methods=['POST'])
 def export_to_github():
     # Print environment variables for debugging
@@ -80,55 +98,6 @@ def export_to_github():
     repo.create_file(file_path, commit_message, all_data_json, branch=branch)
 
     return redirect(url_for('all_data'))
-
-
-@app.route('/scrape', methods=['POST'])
-async def scrape():
-    url = request.form['url']
-    already_scraped = scraped_urls_collection.find_one({"url": url})
-    html = await fetch_content(url)
-
-    phone_number_patterns = [
-        r'\b(?:\d{3} \d{3} \d{3}|\d{2} \d{3} \d{2} \d{2})\b',  # xxx xxx xxx or xx xxx xx xx
-        r'\b\d{3}-\d{3}-\d{3}\b',  # xxx-xxx-xxx
-        r'\b\d{3}.\d{3}.\d{3}\b',  # xxx.xxx.xxx
-        r'\b\d{4} \d{3} \d{3}\b',  # xxxx xxx xxx
-        r'\b\+\d{2} \d{3} \d{3} \d{3}\b',  # +xx xxx xxx xxx
-        r'\b\+\d{2} \d{3}-\d{3}-\d{3}\b'  # +xx xxx-xxx-xxx
-    ]
-
-    loop = asyncio.get_event_loop()
-    with ProcessPoolExecutor() as executor:
-        tasks = [
-            loop.run_in_executor(executor, parse_phone_numbers, html, phone_number_patterns),
-            loop.run_in_executor(executor, parse_emails, html),
-            loop.run_in_executor(executor, parse_street_names, html),
-            loop.run_in_executor(executor, parse_social_media, html, url)
-        ]
-
-        phone_numbers, emails, street_names, social_media = await asyncio.gather(*tasks)
-
-    results = {
-        "phone_numbers": phone_numbers if phone_numbers else [],
-        "emails": emails if emails else [],
-        "street_names": street_names if street_names else [],
-        "social_media": social_media if social_media else []
-    }
-
-    if not already_scraped:
-        site_collection = mydb[url.replace("https://", "").replace("/", "_")]
-        if phone_numbers:
-            site_collection.insert_one({"type": "phone_numbers", "data": phone_numbers})
-        if emails:
-            site_collection.insert_one({"type": "emails", "data": emails})
-        if street_names:
-            site_collection.insert_one({"type": "street_names", "data": street_names})
-        if social_media:
-            site_collection.insert_one({"type": "social_media", "data": social_media})
-
-        scraped_urls_collection.insert_one({"url": url})
-
-    return render_template('results.html', url=url, results=results)
 
 
 @app.route('/all_data')
@@ -170,67 +139,6 @@ def delete_all():
     for collection_name in collections:
         mydb[collection_name].drop()  # Drop collection
     return redirect(url_for('all_data'))
-
-
-async def fetch_content(url):
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(None, requests.get, url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return None
-
-
-def parse_phone_numbers(html, patterns):
-    if html:
-        soup = BeautifulSoup(html, 'html.parser')
-        phone_numbers = []
-        for pattern in patterns:
-            phone_numbers.extend(re.findall(pattern, soup.get_text()))
-        return list(set(phone_numbers))
-    else:
-        return None
-
-
-def parse_emails(html):
-    if html:
-        emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', html)
-        return list(set(emails))
-    else:
-        return None
-
-
-def parse_street_names(html):
-    if html:
-        soup = BeautifulSoup(html, 'html.parser')
-        street_names = [tag.get_text() for tag in soup.find_all(string=re.compile(r'^ul\.', re.IGNORECASE))]
-        return list(set(street_names))
-    else:
-        return None
-
-
-def parse_social_media(html, base_url):
-    if html:
-        social_media_patterns = {
-            "twitter": r'https?://(?:www\.)?twitter\.com/[A-Za-z0-9_]+',
-            "facebook": r'https?://(?:www\.)?facebook\.com/[A-Za-z0-9_.-]+',
-            "instagram": r'https?://(?:www\.)?instagram\.com/[A-Za-z0-9_.-]+',
-            "youtube": r'https?://(?:www\.)?youtube\.com/[A-Za-z0-9_./-]+'
-        }
-        soup = BeautifulSoup(html, 'html.parser')
-        social_media_links = {platform: [] for platform in social_media_patterns}
-
-        for a_tag in soup.find_all('a', href=True):
-            href = a_tag['href']
-            full_url = urljoin(base_url, href)
-
-            for platform, pattern in social_media_patterns.items():
-                if re.match(pattern, full_url):
-                    social_media_links[platform].append(full_url)
-
-        return {platform: list(set(links)) for platform, links in social_media_links.items() if links}
-    else:
-        return None
 
 
 if __name__ == "__main__":

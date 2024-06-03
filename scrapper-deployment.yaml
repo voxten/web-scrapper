@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scrapper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web_scrapper
+  template:
+    metadata:
+      labels:
+        app: web_scrapper
+    spec:
+      containers:
+        - name: scrapper
+          image: voxten/python-docker-scrapper:latest
+          env:
+            - name: MONGO_HOST
+              value: mongodb-service
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "root"
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: "pass"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scrapper-service
+spec:
+  type: ClusterIP
+  selector:
+    app: web_scrapper
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
